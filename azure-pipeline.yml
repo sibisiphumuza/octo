@@ -1,0 +1,53 @@
+﻿trigger:
+- main  # branch to trigger the pipeline
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    displayName: 'Build application'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        # build your application
+        dotnet build akctive.csproj
+      displayName: 'Build'
+
+- stage: Test
+  jobs:
+  - job: TestJob
+    displayName: 'Run tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        # run your tests
+        dotnet test akctive.Tests.csproj
+      displayName: 'Run tests'
+
+- stage: Containerize
+  jobs:
+  - job: ContainerizeJob
+    displayName: 'Build and push Docker image'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        # build and push Docker image
+        docker build -t myapp:latest .
+        docker push myregistry.azurecr.io/akctive:latest
+      displayName: 'Build and push Docker image'
+
+- stage: Release
+  jobs:
+  - job: ReleaseJob
+    displayName: 'Deploy to production'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        # deploy the application to production
+        # Deploy the Docker image to Kubernetes
+        kubectl apply -f deployment.yaml
+      displayName: 'Deploy to production'
