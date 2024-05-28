@@ -1,7 +1,8 @@
 ﻿using octo.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.X509.SigI;
+using Microsoft.AspNet.Identity;
+using System.Diagnostics;
 
 namespace octo.Infrastructure.Persistance
 {
@@ -12,6 +13,11 @@ namespace octo.Infrastructure.Persistance
         public DbSet<ContactInformation> ContactInformations { get; set; }
         public DbSet<AccessPermission> AccessPermissions { get; set; }
         public DbSet<EmergencyContact> EmergencyContacts { get; set; }
+
+        // Akctive-related DbSets
+        public DbSet<Akctivity> Activities { get; set; }
+        public DbSet<HeartRate> HeartRates { get; set; }
+        public DbSet<HealthMetric> HealthMetrics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,6 +47,27 @@ namespace octo.Infrastructure.Persistance
                 .HasMany(ld => ld.EmergencyContacts)
                 .WithOne(ec => ec.User)
                 .HasForeignKey(ec => ec.UserId);
+
+            // Akctive relationships
+            modelBuilder.Entity<OctoUser>()
+                .HasMany(u => u.Activities)
+                .WithOne(a => a.User)
+                .HasForeignKey(a => a.UserId);
+
+            modelBuilder.Entity<OctoUser>()
+                .HasOne(u => u.HealthMetrics)
+                .WithOne(hm => hm.User)
+                .HasForeignKey<HealthMetric>(hm => hm.UserId);
+
+            modelBuilder.Entity<Akctivity>()
+                .HasKey(a => a.ActivityId);
+
+            modelBuilder.Entity<HeartRate>()
+                .HasKey(hr => hr.HeartRateId);
+
+            modelBuilder.Entity<HealthMetric>()
+                .HasKey(hm => hm.HealthMetricsId);
+
         }
 
         // Example method to load LoginDetails with related entities eagerly
@@ -52,6 +79,8 @@ namespace octo.Infrastructure.Persistance
                 .Include(ld => ld.ContactInformations)
                 .Include(ld => ld.AccessPermissions)
                 .Include(ld => ld.EmergencyContacts)
+                .Include(ld => ld.Activities)
+                .Include(ld => ld.HealthMetrics)
                 .SingleOrDefault(ld => ld.Id == userId);
         }
     }

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace octo.Domain.Model
 {
@@ -24,11 +26,13 @@ namespace octo.Domain.Model
         public ICollection<ContactInformation> ContactInformations { get; set; } = [];
         public ICollection<AccessPermission> AccessPermissions { get; set; } = [];
         public ICollection<EmergencyContact> EmergencyContacts { get; set; } = [];
+        public ICollection<Akctivity>? Activities { get; set; }
+        public HealthMetric? HealthMetrics { get; set; }
 
         public string? ResetToken { get; set; }
         public DateTime? ResetTokenExpires { get; set; } // Nullable to indicate whether a token is currently active
     }
-    public class PersonalInformation 
+    public class PersonalInformation
     {
         [Key]
         public required string PersonalInformationId { get; set; }
@@ -96,5 +100,72 @@ namespace octo.Domain.Model
         // Navigation property
         public OctoUser User { get; set; }
     }
+
+    #region Akctivity
+    public class Akctivity
+    {
+        [Key]
+        public int ActivityId { get; set; }
+        public ActivityType Type { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int Steps { get; set; }
+        public double Distance { get; set; } // In kilometers
+
+        // Foreign key
+        public string UserId { get; set; }
+
+        // Navigation property
+        public OctoUser User { get; set; }
+    }
+    public enum ActivityType
+    {
+        Walk,
+        Run
+    }
+
+    #endregion
+
+    #region Heart Rates
+    public class HeartRate
+    {
+        [Key]
+        public int HeartRateId { get; set; }
+        public int Rate { get; set; } // Beats per minute
+        public DateTime Timestamp { get; set; }
+        public MonitoringDevice Device { get; set; }
+
+        // Foreign key
+        public string UserId { get; set; }
+
+        // Navigation property
+        public OctoUser User { get; set; }
+    }
+
+    public enum MonitoringDevice
+    {
+        Watch,
+        ChestStrap
+    }
+
+    #endregion
+
+    #region Health Metric
+
+    public class HealthMetric
+    {
+        [Key]
+        public int HealthMetricsId { get; set; }
+        public bool IsDiabetic { get; set; }
+        public bool HasHighBloodPressure { get; set; }
+
+        // Foreign key
+        public string UserId { get; set; }
+
+        // Navigation property
+        public OctoUser User { get; set; }
+    }
+
+    #endregion
 }
 
