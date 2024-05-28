@@ -21,6 +21,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+
 // Register DbContext
 builder.Services.AddDbContext<IdentityContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -41,6 +43,12 @@ builder.Services.AddScoped<ILoginService, LoginServices>();
 // Register MailKit services and configuration
 builder.Services.Configure<MailKitOptions>(builder.Configuration.GetSection("MailKit"));
 builder.Services.AddScoped<IEmailService, MailKitProvider>();
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
 
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
@@ -77,5 +85,9 @@ else {
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseSerilogRequestLogging(); // Add Serilog request logging
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
 app.MapControllers();
 app.Run();
