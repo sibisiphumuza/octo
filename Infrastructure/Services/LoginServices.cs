@@ -12,6 +12,7 @@ namespace octo.Infrastructure.Services
         private readonly IPasswordHasher<OctoUser> _passwordHasher = passwordHasher;
         private readonly IEmailService _emailService = emailService;
 
+
         public async Task<OctoUser> LoginAsync(string username, string password)
         {
             if (await _userRepository.ValidateCredentialsAsync(username, password))
@@ -80,6 +81,39 @@ namespace octo.Infrastructure.Services
             string subject = "Hello, & Welcome!";
             string body = GenerateWelcomeEmailBody(fullName);
             await _emailService.SendEmailAsync(email, subject, body);
+        }
+
+        public async Task SendResetPasswordEmailAsync(string email, string resetToken)
+        {
+            // Construct the email body using a template
+            string subject = "Password Reset Request";
+            string body = GenerateResetPasswordEmailBody(resetToken);
+
+            // Send the email using the email service
+            await _emailService.SendEmailAsync(email, subject, body);
+        }
+        private static string GenerateResetPasswordEmailBody(string resetToken)
+        {
+            // Generate the email body using a template
+            string template = @"
+            <html>
+            <head>
+                <style>
+                    /* CSS styles for the email */
+                </style>
+            </head>
+            <body>
+                <p>Hello,</p>
+                <p>We have received a request to reset your password. Please use the following link to reset your password:</p>
+                <p><a href='{{resetLink}}'>Reset Password</a></p>
+                <p>If you did not request a password reset, you can ignore this email.</p>
+                <p>Thank you!</p>
+            </body>
+            </html>";
+
+            // Replace placeholder with the actual reset link
+            string resetLink = $"https://example.com/reset-password?token={resetToken}";
+            return template.Replace("{{resetLink}}", resetLink);
         }
         private static string GenerateWelcomeEmailBody(string fullName)
         {
