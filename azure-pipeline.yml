@@ -24,6 +24,7 @@ stages:
     - script: |
         # run your tests
         dotnet test akctive.Tests.csproj
+        dotnet test akctivity.Tests.csproj
       displayName: 'Run tests'
 
 - stage: Containerize

@@ -32,14 +32,9 @@ namespace akctive.Infrastructure.Repository
         }
     }
 
-    public class HeartRateRepository : IHeartRateRepository
+    public class HeartRateRepository(DbContext context) : IHeartRateRepository
     {
-        private readonly DbContext _context;
-
-        public HeartRateRepository(DbContext context)
-        {
-            _context = context;
-        }
+        private readonly DbContext _context = context;
 
         public async Task<IEnumerable<HeartRate>> GetAllHeartRatesAsync()
         {
@@ -60,14 +55,9 @@ namespace akctive.Infrastructure.Repository
         }
     }
 
-    public class HealthMetricRepository : IHealthMetricRepository
+    public class HealthMetricRepository(DbContext context) : IHealthMetricRepository
     {
-        private readonly DbContext _context;
-
-        public HealthMetricRepository(DbContext context)
-        {
-            _context = context;
-        }
+        private readonly DbContext _context = context;
 
         public async Task<HealthMetric> GetHealthMetricForUserAsync(string userId)
         {

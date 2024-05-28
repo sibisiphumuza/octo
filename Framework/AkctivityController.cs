@@ -41,5 +41,38 @@ namespace akctive.Framework
             await _akctivityService.AddActivityAsync(activity);
             return Ok();
         }
+
+        [HttpGet("heart-rate")]
+        public async Task<IActionResult> GetAllHeartRates()
+        {
+            var heartRates = await _akctivityService.GetAllHeartRatesAsync();
+            return Ok(heartRates);
+        }
+
+        [HttpGet("heart-rate/{userId}")]
+        public async Task<IActionResult> GetHeartRatesForUser(string userId)
+        {
+            var heartRates = await _akctivityService.GetHeartRatesForUserAsync(userId);
+            return Ok(heartRates);
+        }
+
+        [HttpGet("health-metric/{userId}")]
+        public async Task<IActionResult> GetHealthMetricForUser(string userId)
+        {
+            var healthMetric = await _akctivityService.GetHealthMetricForUserAsync(userId);
+            return Ok(healthMetric);
+        }
+
+        [HttpPost("health-metric")]
+        public async Task<IActionResult> AddHealthMetric([FromBody] HealthMetric healthMetric)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _akctivityService.AddHealthMetricAsync(healthMetric);
+            return Ok();
+        }
     }
 }
